@@ -1,0 +1,3 @@
+Flask
+requests
+gunicorn  # Remove this if you don't want to use it

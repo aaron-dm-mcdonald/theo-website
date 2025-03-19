@@ -1,26 +1,24 @@
 #!/bin/bash
 
 # Update system packages
-apt update && apt upgrade -y
+sudo apt update
 
 # Install Python3, pip, and Git
-apt install -y python3 python3-pip python3-venv git
+sudo apt install -y python3 python3-pip git
 
 # Set up the application directory
 APP_DIR="/opt/theo-website"
 REPO_URL="https://github.com/aaron-dm-mcdonald/theo-website.git"
 
-
 # Clone the latest version from GitHub
-git clone $REPO_URL $APP_DIR
+sudo git clone $REPO_URL $APP_DIR
 cd $APP_DIR
 
-# Set up Python virtual environment
-python3 -m venv venv
-source venv/bin/activate
+# Install dependencies system-wide
+sudo pip install --break-system-packages -r requirements.txt
 
-# Install dependencies
-pip install -r requirements.txt
+sudo touch /opt/theo-website/flask.log
+sudo chmod 666 /opt/theo-website/flask.log
 
 # Run Flask app in the background
-nohup python3 app.py > flask.log 2>&1 &
+sudo nohup python3 app.py > flask.log 2>&1 &

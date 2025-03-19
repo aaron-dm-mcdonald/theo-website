@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, render_template
 import requests
 import os
 
@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return send_from_directory('/var/www/html', 'index.html')
+    return render_template('index.html')
 
 @app.route('/metadata')
 def metadata():

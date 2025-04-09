@@ -1,18 +1,13 @@
 #!/bin/bash
 
-# Update system packages
+# Update system packages, install needed packages
 sudo apt update
-
-# Install Python3, pip, and Git
 sudo apt install -y python3 python3-pip git
 
-# Set up the application directory
-APP_DIR="/opt/theo-website"
-REPO_URL="https://github.com/aaron-dm-mcdonald/theo-website.git"
 
 # Clone the latest version from GitHub
-sudo git clone $REPO_URL $APP_DIR
-cd $APP_DIR
+sudo git clone https://github.com/aaron-dm-mcdonald/theo-website.git /opt/website
+cd /opt/website
 
 # Install dependencies system-wide
 sudo pip install --break-system-packages -r requirements.txt

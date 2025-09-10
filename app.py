@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, render_template
 import requests
-import os
 
 app = Flask(__name__)
 
@@ -8,23 +7,36 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
+def get_imds_token():
+    """Fetch IMDSv2 token from AWS metadata service."""
+    url = "http://169.254.169.254/latest/api/token"
+    headers = {"X-aws-ec2-metadata-token-ttl-seconds": "21600"}
+    resp = requests.put(url, headers=headers, timeout=2)
+    return resp.text
+
+def get_metadata(path, token):
+    """Fetch a metadata field using IMDSv2 token."""
+    url = f"http://169.254.169.254/latest/meta-data/{path}"
+    headers = {"X-aws-ec2-metadata-token": token}
+    resp = requests.get(url, headers=headers, timeout=2)
+    return resp.text
+
 @app.route('/metadata')
 def metadata():
-    METADATA_URL = "http://metadata.google.internal/computeMetadata/v1"
-    METADATA_FLAVOR_HEADER = {"Metadata-Flavor": "Google"}
-    
-    local_ipv4 = requests.get(f"{METADATA_URL}/instance/network-interfaces/0/ip", headers=METADATA_FLAVOR_HEADER).text
-    zone = requests.get(f"{METADATA_URL}/instance/zone", headers=METADATA_FLAVOR_HEADER).text
-    project_id = requests.get(f"{METADATA_URL}/project/project-id", headers=METADATA_FLAVOR_HEADER).text
-    network_tags = requests.get(f"{METADATA_URL}/instance/tags", headers=METADATA_FLAVOR_HEADER).text
-    hostname = requests.get(f"{METADATA_URL}/instance/hostname", headers=METADATA_FLAVOR_HEADER).text
-    
+    token = get_imds_token()
+
+    # Gather metadata
+    local_ipv4 = get_metadata("local-ipv4", token)
+    az = get_metadata("placement/availability-zone", token)
+    macid = get_metadata("network/interfaces/macs/", token).strip("/")
+    vpc_id = get_metadata(f"network/interfaces/macs/{macid}/vpc-id", token)
+    hostname = get_metadata("hostname", token)
+
     return jsonify({
         "Instance Name": hostname,
         "Instance Private IP Address": local_ipv4,
-        "Zone": zone,
-        "Project ID": project_id,
-        "Network Tags": network_tags
+        "Availability Zone": az,
+        "VPC ID": vpc_id
     })
 
 if __name__ == '__main__':

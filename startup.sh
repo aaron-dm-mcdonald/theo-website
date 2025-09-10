@@ -1,33 +1,27 @@
 #!/bin/bash
+set -e
 
+# Update system
+sudo dnf update -y
 
+# Install dependencies
+sudo dnf install -y python3-pip git
 
-until sudo apt update -qq; do
-  echo "apt update failed. Retrying in 5 seconds..."
-  sleep 5
-done
-
-
-until sudo apt install -y python3 python3-pip git; do
-  echo "apt install failed. Retrying in 5 seconds..."
-  sleep 5
-done
-
+# Variables
 APP_DIR="/opt/theo-website"
-REPO_URL="https://github.com/aaron-dm-mcdonald/theo-website.git"
+REPO_URL="https://github.com/aaron-dm-mcdonald/theo-website-aws.git"
 
-
+# Clone repo
 sudo git clone $REPO_URL $APP_DIR
 cd $APP_DIR
 
-sudo pip install --break-system-packages -r requirements.txt
+# Install Python dependencies
+pip3 install -r requirements.txt
 
+# Setup log file
+sudo touch $APP_DIR/flask.log
+sudo chmod 666 $APP_DIR/flask.log
 
-sudo touch /opt/theo-website/flask.log
-sudo chmod 666 /opt/theo-website/flask.log
-
+# Start Flask app
 echo "Starting Flask application..."
-nohup python3 app.py > flask.log 2>&1 &
-
-
-
+nohup python3 app.py > $APP_DIR/flask.log 2>&1 &

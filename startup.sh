@@ -9,7 +9,7 @@ sudo dnf install -y python3-pip git
 
 # Variables
 APP_DIR="/opt/theo-website"
-REPO_URL="https://github.com/aaron-dm-mcdonald/theo-website-aws.git"
+REPO_URL="https://github.com/aaron-dm-mcdonald/theo-website.git"
 
 # Clone repo
 sudo git clone $REPO_URL $APP_DIR
